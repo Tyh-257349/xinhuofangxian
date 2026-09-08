@@ -234,6 +234,14 @@
   }
   .tower-info-line { font-size: 14px; line-height: 2; }
 
+  /* ---------- 移动端竖屏提示 ---------- */
+  .rotate-tip { position: fixed; inset: 0; z-index: 999; background: #2b1d14; color: #f5e9d0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; }
+  .rotate-tip .rt-title { font-size: 24px; font-weight: bold; letter-spacing: 4px; }
+  .rotate-tip .rt-sub { font-size: 14px; opacity: .75; letter-spacing: 2px; }
+  .rotate-tip .rot-arrow { transform-origin: 36px 104px; animation: rotSweep 1.8s ease-in-out infinite; }
+  @keyframes rotSweep { 0%, 20% { transform: rotate(0deg); } 70%, 100% { transform: rotate(-90deg); } }
+  @media (orientation: portrait) and (max-width: 760px) { .rotate-tip { display: flex; } }
+
   /* ---------- 章节地图 ---------- */
   #mapScreen { padding: 30px 36px 40px; }
   .map-head { text-align: center; margin-bottom: 8px; }
@@ -582,6 +590,21 @@
   </div>
 </div>
 
+<!-- 移动端竖屏提示 -->
+<div class="rotate-tip" id="rotateTip">
+  <svg width="72" height="110" viewBox="0 0 72 110">
+    <rect x="16" y="6" width="40" height="86" rx="8" fill="none" stroke="#f5e9d0" stroke-width="3"/>
+    <rect x="24" y="16" width="24" height="56" rx="3" fill="rgba(245,233,208,.25)"/>
+    <circle cx="36" cy="82" r="4" fill="#f5e9d0"/>
+    <g class="rot-arrow">
+      <path d="M2 104 a34 34 0 0 1 68 0" fill="none" stroke="#e67e22" stroke-width="3" stroke-dasharray="4 6" stroke-linecap="round"/>
+      <path d="M62 96 l10 8 -13 4 z" fill="#e67e22"/>
+    </g>
+  </svg>
+  <div class="rt-title">请横屏体验</div>
+  <div class="rt-sub">旋转手机，继续长征之路</div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="questions2.js"></script>
@@ -660,19 +683,19 @@ const CH_WAVES = [
   {n:6, midBoss:true, bigBoss:true}
 ];
 const WAVES_PER_CH = CH_WAVES.map(c => c.n);
-/* 波次生成器：每章内敌军数量逐波递增，章节越高数量越多、间隔越紧 */
+/* 波次生成器：每波敌军总数 ≥10 且逐波递增，章节越高数量越多、间隔越紧 */
 function buildWaveSet(chIdx) {
   const cfg = CH_WAVES[chIdx];
   const set = [];
   for (let w = 1; w <= cfg.n; w++) {
     const grp = [];
     const isLast = w === cfg.n;
-    const gruntN = Math.min(4 + chIdx + w, 16);
-    const fastN = Math.min(Math.max(0, Math.floor((chIdx + w) * 0.7) - 2), 10);
-    const heavyN = Math.min(Math.floor((chIdx + w + 1) / 3), 6);
-    grp.push({t:'grunt', n:gruntN, gap:Math.max(0.45, 1.15 - chIdx*0.04 - w*0.04)});
-    if (fastN) grp.push({t:'fast', n:fastN, gap:Math.max(0.4, 0.8 - chIdx*0.03)});
-    if (heavyN) grp.push({t:'heavy', n:heavyN, gap:1.1});
+    const gruntN = Math.min(9 + chIdx * 2 + w * 2, 32);
+    const fastN = Math.min(2 + Math.floor((chIdx + w) * 0.8), 14);
+    const heavyN = Math.min(1 + Math.floor((chIdx + w + 1) / 2), 10);
+    grp.push({t:'grunt', n:gruntN, gap:Math.max(0.38, 1.0 - chIdx*0.04 - w*0.04)});
+    if (fastN) grp.push({t:'fast', n:fastN, gap:Math.max(0.32, 0.7 - chIdx*0.03)});
+    if (heavyN) grp.push({t:'heavy', n:heavyN, gap:1.0});
     if (cfg.midBoss && w === 3) grp.push({t:'bossMini', n:1, gap:2});
     if (isLast && cfg.lastBoss) grp.push({t:'boss', n:1, gap:3});
     if (isLast && cfg.bigBoss) grp.push({t:'bossBig', n:1, gap:3});
@@ -1007,12 +1030,18 @@ function answerQuiz(btn, right, box) {
     setTimeout(() => { hideMask('quizMask'); updateHUD(); toast('+' + gain + ' 火种，全军士气大振！'); }, 900);
   } else {
     btn.classList.add('wrong');
+    if (quizCorrectBtn) {
+      quizCorrectBtn.classList.add('right');
+      document.getElementById('quizFoot').innerHTML =
+        '回答错误……正确答案是「<b>' + quizCorrectBtn.textContent + '</b>」，休整 10 秒后再来（连对清零）';
+    } else {
+      document.getElementById('quizFoot').textContent = '回答错误……休整 10 秒后再来（连对清零）';
+    }
     combo = 0;
     AudioSys.sfx('wrong');
     quizCooldownUntil = performance.now() + 10000;
-    document.getElementById('quizFoot').textContent = '回答错误……休整 10 秒后再来（连对清零）';
     startCooldownUI();
-    setTimeout(() => { hideMask('quizMask'); updateHUD(); }, 1400);
+    setTimeout(() => { hideMask('quizMask'); updateHUD(); }, 2600);
   }
   updateHUD();
 }
@@ -1859,21 +1888,59 @@ function drawTower(tw, t) {
 function drawEnemy(e) {
   ctx.fillStyle = 'rgba(0,0,0,.15)';
   ctx.beginPath(); ctx.ellipse(e.x, e.y + e.size * 0.8, e.size, e.size * 0.4, 0, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = e.color;
-  ctx.beginPath(); ctx.arc(e.x, e.y, e.size, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#565b4a';
-  ctx.beginPath(); ctx.arc(e.x, e.y - e.size * 0.35, e.size * 0.72, Math.PI, 0); ctx.fill();
-  if (e.type === 'boss' || e.type === 'bossMini' || e.type === 'bossBig') {
-    ctx.strokeStyle = '#8e2b22'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(e.x, e.y - e.size); ctx.lineTo(e.x, e.y - e.size - 12); ctx.stroke();
+  const isBoss = e.type === 'boss' || e.type === 'bossMini' || e.type === 'bossBig';
+  if (isBoss) {
+    const spikes = e.type === 'bossBig' ? 10 : 8;
+    // 暗红威压光环（缓慢脉动）
+    const pulse = 1 + Math.sin(performance.now() / 300) * 0.08;
+    ctx.strokeStyle = 'rgba(176,58,46,.55)';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(e.x, e.y, e.size * 1.55 * pulse, 0, Math.PI*2); ctx.stroke();
+    // 尖刺星形装甲身躯
+    ctx.fillStyle = '#4a2320';
+    ctx.beginPath();
+    for (let i = 0; i < spikes * 2; i++) {
+      const r = i % 2 === 0 ? e.size * 1.35 : e.size * 0.85;
+      const a = (Math.PI * i) / spikes - Math.PI / 2;
+      i === 0 ? ctx.moveTo(e.x + Math.cos(a) * r, e.y + Math.sin(a) * r)
+              : ctx.lineTo(e.x + Math.cos(a) * r, e.y + Math.sin(a) * r);
+    }
+    ctx.closePath(); ctx.fill();
+    // 躯干
+    ctx.fillStyle = e.color;
+    ctx.beginPath(); ctx.arc(e.x, e.y, e.size * 0.85, 0, Math.PI*2); ctx.fill();
+    // 钢盔 + 红色护目镜
+    ctx.fillStyle = '#2e2019';
+    ctx.beginPath(); ctx.arc(e.x, e.y - e.size * 0.15, e.size * 0.55, Math.PI, 0); ctx.fill();
+    ctx.fillStyle = '#e74c3c';
+    ctx.fillRect(e.x - e.size * 0.38, e.y - e.size * 0.32, e.size * 0.76, e.size * 0.15);
+    // 背后军旗
+    ctx.strokeStyle = '#3a2a1e'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(e.x, e.y - e.size * 1.2); ctx.lineTo(e.x, e.y - e.size * 1.2 - 14); ctx.stroke();
+    ctx.fillStyle = '#7a1f16';
+    ctx.beginPath();
+    ctx.moveTo(e.x, e.y - e.size * 1.2 - 14);
+    ctx.lineTo(e.x + 15, e.y - e.size * 1.2 - 10);
+    ctx.lineTo(e.x, e.y - e.size * 1.2 - 6);
+    ctx.closePath(); ctx.fill();
+    // 头目名号
     ctx.fillStyle = '#8e2b22';
-    ctx.beginPath(); ctx.moveTo(e.x, e.y - e.size - 12); ctx.lineTo(e.x + 12, e.y - e.size - 9); ctx.lineTo(e.x, e.y - e.size - 6); ctx.closePath(); ctx.fill();
+    ctx.font = 'bold 11px "Kaiti SC","KaiTi",serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(e.type === 'bossBig' ? '★ 围剿总司令 ★' : e.type === 'boss' ? '★ 铁索封锁头目 ★' : '◆ 桥头碉楼头目 ◆',
+      e.x, e.y - e.size * 1.2 - 18);
+    ctx.textAlign = 'start';
+  } else {
+    ctx.fillStyle = e.color;
+    ctx.beginPath(); ctx.arc(e.x, e.y, e.size, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#565b4a';
+    ctx.beginPath(); ctx.arc(e.x, e.y - e.size * 0.35, e.size * 0.72, Math.PI, 0); ctx.fill();
   }
-  const w = e.size * 2.2, ratio = Math.max(e.hp / e.maxHp, 0);
+  const w = e.size * (isBoss ? 2.8 : 2.2), ratio = Math.max(e.hp / e.maxHp, 0);
   ctx.fillStyle = 'rgba(61,43,31,.5)';
-  ctx.fillRect(e.x - w/2, e.y - e.size - 8, w, 4);
+  ctx.fillRect(e.x - w/2, e.y - e.size - 8, w, isBoss ? 5 : 4);
   ctx.fillStyle = ratio > 0.5 ? '#7a9b4e' : ratio > 0.25 ? '#e67e22' : '#b03a2e';
-  ctx.fillRect(e.x - w/2, e.y - e.size - 8, w * ratio, 4);
+  ctx.fillRect(e.x - w/2, e.y - e.size - 8, w * ratio, isBoss ? 5 : 4);
 }
 
 /* ================= 交互 ================= */
@@ -1913,6 +1980,32 @@ window.onerror = function(msg, src, line) {
 document.getElementById('muteBtn').onclick = (ev) => { ev.stopPropagation(); AudioSys.toggle(); updateMuteIcon(); };
 updateMuteIcon();
 document.addEventListener('click', () => AudioSys.startBGM(), { once: true });
+
+/* ================= 移动端自动横屏 ================= */
+const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+function tryLockLandscape() {
+  if (!isTouchDevice || window.innerWidth >= window.innerHeight) return;
+  const el = document.documentElement;
+  const lock = () => {
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(() => {});
+    }
+  };
+  if (el.requestFullscreen) {
+    el.requestFullscreen().then(lock).catch(() => {});
+  } else {
+    lock();
+  }
+}
+document.addEventListener('touchstart', tryLockLandscape, { once: true, passive: true });
+window.addEventListener('orientationchange', () => {
+  // 游戏进行中转回竖屏时，再次尝试锁回横屏
+  setTimeout(() => {
+    if (!mapScreenMode && isTouchDevice && window.innerHeight > window.innerWidth && document.fullscreenElement) {
+      tryLockLandscape();
+    }
+  }, 300);
+});
 mapScreenMode = true;
 computeMap(0); // 给 canvas 一个初始地图（隐藏状态下不渲染）
 renderPlayerBar();
