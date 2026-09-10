@@ -1,0 +1,16 @@
+{
+  "name": "薪火防线 · 长征之路",
+  "short_name": "薪火防线",
+  "description": "红色历史答题塔防：答题赢取信仰火种，一章一关重走长征路",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#2b1d14",
+  "theme_color": "#8e2b22",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

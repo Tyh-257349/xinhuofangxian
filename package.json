@@ -1,0 +1,9 @@
+{
+  "name": "xinhuo-defense-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "《薪火防线》红色历史答题塔防 Demo",
+  "scripts": {
+    "dev": "node server.js"
+  }
+}

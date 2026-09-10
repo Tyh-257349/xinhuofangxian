@@ -2,7 +2,15 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#8e2b22">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="薪火防线">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>薪火防线 · 长征之路</title>
 <style>
   :root {
@@ -25,10 +33,11 @@
     align-items: flex-start;
     padding: 18px 12px;
     min-height: 100vh;
+    overflow-x: hidden;
   }
   .game-wrap {
-    width: 1240px;
-    max-width: 100%;
+    width: 100%;
+    max-width: 1240px;
     background: var(--paper);
     border-radius: 8px;
     box-shadow: 0 12px 40px rgba(0,0,0,.5);
@@ -73,8 +82,22 @@
   }
   .hud .stat b { font-size: 16px; color: var(--red-deep); }
   .main { display: flex; }
-  .canvas-box { background: var(--paper-dark); padding: 10px; }
-  canvas { display: block; border-radius: 6px; box-shadow: inset 0 0 0 2px #c9ad7c; }
+  .canvas-box {
+    background: var(--paper-dark);
+    padding: 10px;
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    max-width: 960px;
+    height: auto;
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 2px #c9ad7c;
+  }
   .sidebar {
     width: 250px;
     flex-shrink: 0;
@@ -232,12 +255,28 @@
     margin-bottom: 6px;
     letter-spacing: 1px;
   }
+  .cert-wrap {
+    margin-top: 12px;
+    border: 1px solid #e2d0a6;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    line-height: 0;
+  }
+  .cert-wrap canvas {
+    width: 100%;
+    height: auto;
+    border-radius: 0;
+    box-shadow: none;
+    display: block;
+  }
   .tower-info-line { font-size: 14px; line-height: 2; }
 
   /* ---------- 移动端竖屏提示 ---------- */
   .rotate-tip { position: fixed; inset: 0; z-index: 999; background: #2b1d14; color: #f5e9d0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; }
   .rotate-tip .rt-title { font-size: 24px; font-weight: bold; letter-spacing: 4px; }
   .rotate-tip .rt-sub { font-size: 14px; opacity: .75; letter-spacing: 2px; }
+  .rotate-tip .rt-tip { font-size: 12px; opacity: .55; line-height: 1.8; margin-top: 8px; letter-spacing: 1px; }
   .rotate-tip .rot-arrow { transform-origin: 36px 104px; animation: rotSweep 1.8s ease-in-out infinite; }
   @keyframes rotSweep { 0%, 20% { transform: rotate(0deg); } 70%, 100% { transform: rotate(-90deg); } }
   @media (orientation: portrait) and (max-width: 760px) { .rotate-tip { display: flex; } }
@@ -363,6 +402,67 @@
     letter-spacing: 1px;
   }
   .toast.show { opacity: 1; }
+
+  /* ---------- 小屏幕自适应 ---------- */
+  @media (max-width: 880px) {
+    body { padding: 6px; }
+    header { padding: 8px 12px; gap: 10px; }
+    .title-block h1 { font-size: 20px; letter-spacing: 2px; }
+    .title-block .sub { font-size: 10px; }
+    .hud { gap: 6px; font-size: 12px; flex-wrap: wrap; }
+    .hud .stat { padding: 3px 7px; }
+    .hud .stat b { font-size: 14px; }
+    .canvas-box { padding: 6px; }
+    .canvas-box canvas { width: auto; max-width: 100%; max-height: calc(100vh - 130px); }
+    .sidebar { width: 172px; padding: 8px; gap: 8px; max-height: calc(100vh - 24px); overflow-y: auto; }
+    #quizBtn { order: -3; }
+    #comboBox { order: -2; }
+    #waveBtn { order: -1; }
+    .side-title { font-size: 12px; padding-bottom: 3px; }
+    .tower-card { padding: 5px 7px; gap: 7px; }
+    .tower-icon { width: 26px; height: 26px; }
+    .tower-card .t-name { font-size: 12px; }
+    .tower-card .t-desc { font-size: 9px; }
+    .tower-card .t-cost { font-size: 10px; }
+    .btn { padding: 8px; font-size: 13px; letter-spacing: 1px; }
+    .combo-box { font-size: 11px; padding: 5px; }
+    .combo-box b { font-size: 13px; }
+    .help { font-size: 10px; padding: 6px 8px; line-height: 1.5; }
+    /* 章节地图 */
+    #mapScreen { padding: 0 0 10px; }
+    .hero { padding: 16px 10px 0; }
+    .hero .flag-deco { display: none; }
+    .hero h1 { font-size: 30px; letter-spacing: 6px; }
+    .hero .sub2 { font-size: 11px; letter-spacing: 1px; }
+    .hero .poem { font-size: 14px; letter-spacing: 2px; }
+    .flame-row { gap: 6px; margin-top: 12px; }
+    .flame-unit { width: 58px; }
+    .flame-unit .flame-label { font-size: 9px; }
+    .player-bar { margin-top: 10px; gap: 8px; }
+    .player-bar .p-tag { font-size: 13px; }
+    .player-bar .p-name-input { width: 150px; font-size: 14px; padding: 8px 10px; }
+    .map-route { margin: 14px 2px 4px; }
+    .ch-node .dot { width: 34px; height: 34px; font-size: 15px; }
+    .ch-node .ch-name { font-size: 10px; margin-top: 5px; }
+    .ch-node .ch-state { font-size: 9px; }
+    .map-tools { margin-top: 14px; gap: 10px; }
+    .map-tools .btn { width: 150px; padding: 9px; font-size: 13px; }
+    .scene { margin-top: 12px; }
+    .quote { font-size: 12px; padding: 12px 10px 14px; }
+    /* 弹窗 */
+    .modal { padding: 16px; }
+    .modal h3 { font-size: 17px; margin-bottom: 10px; }
+    .quiz-q { font-size: 14px; padding: 10px 12px; margin-bottom: 10px; }
+    .quiz-opt { font-size: 13px; padding: 9px 11px; margin-bottom: 7px; }
+    .history-card { font-size: 12px; padding: 10px; line-height: 1.7; }
+  }
+  @media (max-width: 560px) {
+    .sidebar { width: 150px; }
+    .tower-card .t-desc { display: none; }
+    .help { display: none; }
+    .hero h1 { font-size: 24px; }
+    .map-tools .btn { width: 130px; }
+  }
 </style>
 </head>
 <body>
@@ -521,6 +621,10 @@
         营地耐久 <b id="hpNum">5</b>
       </div>
       <div class="stat">波次 <b id="waveNum">0 / 3</b></div>
+      <div class="stat">
+        <svg width="15" height="16" viewBox="0 0 16 16"><path d="M3 1.5h7l3.5 3.5V14.5H3z" fill="#fff8e6" stroke="#6b5138" stroke-width="1.2" stroke-linejoin="round"/><path d="M10 1.5V5h3.5" fill="none" stroke="#6b5138" stroke-width="1.2"/><line x1="5.5" y1="7.5" x2="11" y2="7.5" stroke="#b03a2e" stroke-width="1.4"/><line x1="5.5" y1="10.5" x2="11" y2="10.5" stroke="#b03a2e" stroke-width="1.4"/></svg>
+        答题 <b id="quizStatNum">0 / 0</b>
+      </div>
       <button class="stat" id="muteBtn" title="音乐音效开关" style="cursor:pointer;"></button>
     </div>
   </header>
@@ -603,11 +707,11 @@
   </svg>
   <div class="rt-title">请横屏体验</div>
   <div class="rt-sub">旋转手机，继续长征之路</div>
+  <div class="rt-tip">小提示：将本页「添加到主屏幕」，<br>从桌面图标打开可自动全屏横屏</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<script src="questions2.js"></script>
 <script>
 'use strict';
 /* ================= 基础 ================= */
@@ -721,19 +825,23 @@ fetch('questions.json').then(r => {
 /* ================= 存档（按小战士姓名分档，各自独立保存） ================= */
 const SAVE_PREFIX = 'xinhuo_save_v1_';
 let playerName = localStorage.getItem('xf_player') || '';
-let progress = {unlocked: 1, cards: []};
+let progress = {unlocked: 1, cards: [], quiz: {correct: 0, total: 0}};
+let quizStats = {correct: 0, total: 0};   // 累计答题统计（运行时，建档后随存档持久化）
 function loadProgress() {
-  progress = {unlocked: 1, cards: []};
+  progress = {unlocked: 1, cards: [], quiz: {correct: 0, total: 0}};
+  quizStats = {correct: 0, total: 0};
   if (!playerName) return;
   try {
     let raw = localStorage.getItem(SAVE_PREFIX + playerName);
     if (!raw) raw = localStorage.getItem('xinhuo_save_v1'); // 旧版单档数据迁移给首个建档者
     const s = raw ? JSON.parse(raw) : null;
     if (s && s.unlocked) progress = s;
+    if (s && s.quiz) quizStats = {correct: s.quiz.correct | 0, total: s.quiz.total | 0};
   } catch (e) {}
 }
 function save() {
   if (!playerName) return;
+  progress.quiz = quizStats;
   localStorage.setItem(SAVE_PREFIX + playerName, JSON.stringify(progress));
 }
 loadProgress();
@@ -873,6 +981,7 @@ function updateHUD() {
   document.getElementById('fireNum').textContent = fire;
   document.getElementById('hpNum').textContent = baseHP;
   document.getElementById('waveNum').textContent = waveIdx + ' / ' + totalWaves;
+  document.getElementById('quizStatNum').textContent = quizStats.correct + ' / ' + quizStats.total;
   const mult = [1, 1.5, 2, 3][Math.min(combo, 3)];
   document.getElementById('comboBox').innerHTML = '连对 <b>' + combo + '</b> 题 · 倍率 ×' + mult;
   renderShop();
@@ -983,6 +1092,7 @@ function quizTimeout() {
   if (quizCorrectBtn) quizCorrectBtn.classList.add('right');
   AudioSys.sfx('wrong');
   combo = 0;
+  quizStats.total++; save();
   quizCooldownUntil = performance.now() + 10000;
   startCooldownUI();
   document.getElementById('quizFoot').textContent = '时间到！正确答案已标出，休整 10 秒后再来（连对清零）';
@@ -1020,6 +1130,7 @@ function answerQuiz(btn, right, box) {
   [...box.children].forEach(b => b.disabled = true);
   if (right) {
     btn.classList.add('right');
+    quizStats.correct++; quizStats.total++; save();
     const mult = [1, 1.5, 2, 3][Math.min(combo, 3)];
     const gain = Math.round(30 * mult);
     fire += gain;
@@ -1038,6 +1149,7 @@ function answerQuiz(btn, right, box) {
       document.getElementById('quizFoot').textContent = '回答错误……休整 10 秒后再来（连对清零）';
     }
     combo = 0;
+    quizStats.total++; save();
     AudioSys.sfx('wrong');
     quizCooldownUntil = performance.now() + 10000;
     startCooldownUI();
@@ -1422,11 +1534,7 @@ function endGame(win) {
       next.onclick = () => { hideMask('endMask'); showChapterIntro(ch + 1); };
       row.appendChild(next);
     } else {
-      const fin = document.createElement('div');
-      fin.className = 'history-card';
-      fin.style.marginBottom = '0';
-      fin.innerHTML = '<div class="h-title">长征胜利</div>你率部走完了二万五千里征程，十枚精神火种尽数点亮。长征精神——把全国人民和中华民族的根本利益看得高于一切，为了救国救民，不怕任何艰难险阻，不惜付出一切牺牲——将永远照亮前行之路。';
-      document.getElementById('endCard').appendChild(fin);
+      showFinale();
     }
     const back = document.createElement('button');
     back.className = 'btn btn-plain';
@@ -1451,7 +1559,125 @@ function endGame(win) {
   showMask('endMask');
 }
 
-/* ================= 章节地图界面 ================= */
+/* ================= 通关结算 · 薪火相传 · 荣誉证书 ================= */
+function certRank(correct, total) {
+  const rate = total ? correct / total : 0;
+  if (rate >= 0.9) return {title: '长征先锋', medal: 'gold', adj: '卓越，特授予金牌', color: '#9a7b12', note: '红色历史，了然于胸；信仰之火，愈燃愈旺。'};
+  if (rate >= 0.75) return {title: '钢铁战士', medal: 'silver', adj: '优秀，特授予银牌', color: '#6f7d8c', note: '百折不挠，愈挫愈勇；再接再厉，直指金牌。'};
+  if (rate >= 0.6) return {title: '优秀红军战士', medal: 'bronze', adj: '良好，特授予铜牌', color: '#a0662c', note: '已具根基，更需精进；把每一道错题变成熟题。'};
+  return {title: '长征结业证书', medal: 'bronze', adj: '坚毅，完成全程', color: '#8e2b22', note: '长征路遥，学无止境；再走一遍，必有所成。'};
+}
+function drawCertificate(ctx, name, correct, total, rate, rank) {
+  const W = 900, H = 620;
+  const KAI = '"Kaiti SC","STKaiti","KaiTi","楷体",serif';
+  const SONG = '"Songti SC","STSong","SimSun","宋体",serif';
+  // 纸质底与纹理
+  ctx.fillStyle = '#f7eed6'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = 'rgba(201,162,39,.06)';
+  let seed = correct * 7 + total * 13 + 5;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < 60; i++) ctx.fillRect(rnd() * W, rnd() * H, 2, 2);
+  // 双边框
+  ctx.strokeStyle = '#8e2b22'; ctx.lineWidth = 10; ctx.strokeRect(15, 15, W - 30, H - 30);
+  ctx.strokeStyle = '#c9a227'; ctx.lineWidth = 2; ctx.strokeRect(31, 31, W - 62, H - 62);
+  // 左右红旗装饰
+  for (const flip of [0, 1]) {
+    const bx = flip ? W - 64 : 64, dir = flip ? -1 : 1;
+    ctx.strokeStyle = '#6b5138'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(bx, 122); ctx.lineTo(bx, 232); ctx.stroke();
+    ctx.fillStyle = '#b03a2e';
+    ctx.beginPath();
+    ctx.moveTo(bx, 126);
+    ctx.quadraticCurveTo(bx + dir * 48, 114, bx + dir * 88, 130);
+    ctx.quadraticCurveTo(bx + dir * 52, 144, bx, 152);
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.textAlign = 'center';
+  // 顶部与主标题
+  ctx.fillStyle = '#6b5138'; ctx.font = '20px ' + SONG;
+  ctx.fillText('薪 火 防 线 · 长 征 之 路', W / 2, 86);
+  ctx.fillStyle = '#8e2b22'; ctx.font = '62px ' + KAI;
+  ctx.fillText('荣 誉 证 书', W / 2, 178);
+  // 等级称号
+  ctx.fillStyle = rank.color; ctx.font = '32px ' + KAI;
+  ctx.fillText('「 ' + rank.title + ' 」', W / 2, 232);
+  // 正文
+  ctx.fillStyle = '#3d2b1f'; ctx.font = '22px ' + SONG;
+  ctx.fillText('兹  证  明', W / 2, 292);
+  ctx.fillStyle = '#8e2b22'; ctx.font = 'bold 42px ' + KAI;
+  ctx.fillText(name, W / 2, 346);
+  ctx.fillStyle = '#3d2b1f'; ctx.font = '22px ' + SONG;
+  ctx.fillText('同志在重走长征的答题征程中表现' + rank.adj, W / 2, 392);
+  ctx.font = '26px ' + KAI;
+  ctx.fillText('共作答 ' + total + ' 题 · 答对 ' + correct + ' 题 · 正确率 ' + rate + '%', W / 2, 438);
+  // 奖章
+  const mx = W / 2, my = 516;
+  ctx.fillStyle = '#b03a2e';
+  ctx.beginPath();
+  ctx.moveTo(mx - 26, my - 12); ctx.lineTo(mx - 10, my + 32); ctx.lineTo(mx, my + 14);
+  ctx.lineTo(mx + 10, my + 32); ctx.lineTo(mx + 26, my - 12); ctx.closePath(); ctx.fill();
+  const medalCol = {gold: '#c9a227', silver: '#9aa3ad', bronze: '#b0793c'}[rank.medal];
+  ctx.fillStyle = medalCol;
+  ctx.beginPath(); ctx.arc(mx, my, 33, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,.65)'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(mx, my, 25, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 19px ' + KAI;
+  ctx.fillText({gold: '金奖', silver: '银奖', bronze: '铜奖'}[rank.medal], mx, my + 7);
+  // 日期与落款
+  const d = new Date();
+  ctx.textAlign = 'left'; ctx.fillStyle = '#6b5138'; ctx.font = '17px ' + SONG;
+  ctx.fillText('证书编号：XH-' + String(1000 + correct) + '-' + String(1000 + total), 64, H - 62);
+  ctx.fillText('颁发日期：' + d.getFullYear() + ' 年 ' + (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日', 64, H - 34);
+  ctx.textAlign = 'right';
+  ctx.fillText('薪火防线 · 颁', W - 200, H - 48);
+  // 印章
+  ctx.strokeStyle = 'rgba(176,58,46,.85)'; ctx.lineWidth = 3;
+  ctx.strokeRect(W - 176, H - 140, 82, 82);
+  ctx.fillStyle = 'rgba(176,58,46,.85)'; ctx.textAlign = 'center';
+  ctx.font = 'bold 28px ' + KAI;
+  ctx.fillText('薪火', W - 135, H - 104);
+  ctx.fillText('防线', W - 135, H - 70);
+  ctx.textAlign = 'start';
+}
+function showFinale() {
+  const correct = quizStats.correct, total = quizStats.total;
+  const rate = total ? Math.round(correct / total * 100) : 0;
+  const rank = certRank(correct, total);
+  const fin = document.createElement('div');
+  fin.className = 'history-card';
+  fin.innerHTML =
+    '<div class="h-title">长征胜利 · 薪火相传</div>' +
+    '你率部走完了二万五千里征程，十枚精神火种尽数点亮。你作答的每一道题，都是一次与历史的对话——从瑞金到吴起镇，你不仅在守卫营地，更在守护记忆：守护那些把个人生死置之度外、把民族存亡扛在肩上的名字。<br>' +
+    '长征精神不是陈列馆里的标本，而是可以传递的火种：<b>坚定信念、实事求是、独立自主、敢闯新路</b>。愿你把这簇火种带回日常的学习与生活——这，正是这款游戏最想颁发的"证书"。<br><br>' +
+    '<b>答题总结：</b>共作答 ' + total + ' 题 · 答对 ' + correct + ' 题 · 正确率 ' + rate + '%<br>' +
+    '授予称号：<b style="color:' + rank.color + '">「' + rank.title + '」</b><br>' +
+    '<span style="color:#8e2b22">' + rank.note + '</span>';
+  document.getElementById('endCard').appendChild(fin);
+  // 证书画布
+  const wrap = document.createElement('div');
+  wrap.className = 'cert-wrap';
+  const cv = document.createElement('canvas');
+  cv.id = 'certCanvas'; cv.width = 900; cv.height = 620;
+  wrap.appendChild(cv);
+  document.getElementById('endCard').appendChild(wrap);
+  drawCertificate(cv.getContext('2d'), playerName || '无名小战士', correct, total, rate, rank);
+  // 下载按钮
+  const row = document.getElementById('endRow');
+  const dl = document.createElement('button');
+  dl.className = 'btn btn-quiz';
+  dl.textContent = '保存证书图片';
+  dl.onclick = () => {
+    cv.toBlob(blob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = '薪火防线荣誉证书.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      toast('证书已保存到下载文件夹');
+    }, 'image/png');
+  };
+  row.insertBefore(dl, row.firstChild);
+}
 function backToMap() {
   gameOver = true;
   mapScreenMode = true;
@@ -1524,7 +1750,8 @@ document.getElementById('galleryBtn').onclick = () => {
 };
 document.getElementById('galleryClose').onclick = () => hideMask('galleryMask');
 document.getElementById('resetProgressBtn').onclick = () => {
-  progress = {unlocked: 1, cards: []};
+  quizStats = {correct: 0, total: 0};
+  progress = {unlocked: 1, cards: [], quiz: quizStats};
   save();
   buildChapterGrid();
   renderPlayerBar();
@@ -1566,7 +1793,8 @@ function renderPlayerBar() {
     const tag = document.createElement('span');
     tag.className = 'p-tag';
     tag.innerHTML = '🔥 小战士：<b style="color:#8e2b22">' + playerName + '</b>' +
-      ' · 已解锁 ' + progress.unlocked + ' / 10 章 · 点亮精神火种 ' + progress.cards.length + ' 枚';
+      ' · 已解锁 ' + progress.unlocked + ' / 10 章 · 点亮精神火种 ' + progress.cards.length + ' 枚' +
+      ' · 累计答题 ' + quizStats.correct + ' / ' + quizStats.total + ' 题';
     const sw = document.createElement('button');
     sw.className = 'p-switch';
     sw.textContent = '切换身份';
@@ -1980,6 +2208,11 @@ window.onerror = function(msg, src, line) {
 document.getElementById('muteBtn').onclick = (ev) => { ev.stopPropagation(); AudioSys.toggle(); updateMuteIcon(); };
 updateMuteIcon();
 document.addEventListener('click', () => AudioSys.startBGM(), { once: true });
+
+/* ================= PWA 离线缓存 ================= */
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
 
 /* ================= 移动端自动横屏 ================= */
 const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
