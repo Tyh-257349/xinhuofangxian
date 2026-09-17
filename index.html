@@ -273,15 +273,6 @@
   }
   .tower-info-line { font-size: 14px; line-height: 2; }
 
-  /* ---------- 移动端竖屏提示 ---------- */
-  .rotate-tip { position: fixed; inset: 0; z-index: 999; background: #2b1d14; color: #f5e9d0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; }
-  .rotate-tip .rt-title { font-size: 24px; font-weight: bold; letter-spacing: 4px; }
-  .rotate-tip .rt-sub { font-size: 14px; opacity: .75; letter-spacing: 2px; }
-  .rotate-tip .rt-tip { font-size: 12px; opacity: .55; line-height: 1.8; margin-top: 8px; letter-spacing: 1px; }
-  .rotate-tip .rot-arrow { transform-origin: 36px 104px; animation: rotSweep 1.8s ease-in-out infinite; }
-  @keyframes rotSweep { 0%, 20% { transform: rotate(0deg); } 70%, 100% { transform: rotate(-90deg); } }
-  @media (orientation: portrait) and (max-width: 760px) { .rotate-tip { display: flex; } }
-
   /* ---------- 章节地图 ---------- */
   #mapScreen { padding: 30px 36px 40px; }
   .map-head { text-align: center; margin-bottom: 8px; }
@@ -693,22 +684,6 @@
     <div id="galleryList"></div>
     <div class="row"><button class="btn btn-plain" id="galleryClose">关 闭</button></div>
   </div>
-</div>
-
-<!-- 移动端竖屏提示 -->
-<div class="rotate-tip" id="rotateTip">
-  <svg width="72" height="110" viewBox="0 0 72 110">
-    <rect x="16" y="6" width="40" height="86" rx="8" fill="none" stroke="#f5e9d0" stroke-width="3"/>
-    <rect x="24" y="16" width="24" height="56" rx="3" fill="rgba(245,233,208,.25)"/>
-    <circle cx="36" cy="82" r="4" fill="#f5e9d0"/>
-    <g class="rot-arrow">
-      <path d="M2 104 a34 34 0 0 1 68 0" fill="none" stroke="#e67e22" stroke-width="3" stroke-dasharray="4 6" stroke-linecap="round"/>
-      <path d="M62 96 l10 8 -13 4 z" fill="#e67e22"/>
-    </g>
-  </svg>
-  <div class="rt-title">请横屏体验</div>
-  <div class="rt-sub">旋转手机，继续长征之路</div>
-  <div class="rt-tip">小提示：将本页「添加到主屏幕」，<br>从桌面图标打开可自动全屏横屏</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -2215,31 +2190,6 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 
-/* ================= 移动端自动横屏 ================= */
-const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-function tryLockLandscape() {
-  if (!isTouchDevice || window.innerWidth >= window.innerHeight) return;
-  const el = document.documentElement;
-  const lock = () => {
-    if (screen.orientation && screen.orientation.lock) {
-      screen.orientation.lock('landscape').catch(() => {});
-    }
-  };
-  if (el.requestFullscreen) {
-    el.requestFullscreen().then(lock).catch(() => {});
-  } else {
-    lock();
-  }
-}
-document.addEventListener('touchstart', tryLockLandscape, { once: true, passive: true });
-window.addEventListener('orientationchange', () => {
-  // 游戏进行中转回竖屏时，再次尝试锁回横屏
-  setTimeout(() => {
-    if (!mapScreenMode && isTouchDevice && window.innerHeight > window.innerWidth && document.fullscreenElement) {
-      tryLockLandscape();
-    }
-  }, 300);
-});
 mapScreenMode = true;
 computeMap(0); // 给 canvas 一个初始地图（隐藏状态下不渲染）
 renderPlayerBar();
